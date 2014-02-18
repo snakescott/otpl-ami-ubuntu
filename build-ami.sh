@@ -48,7 +48,7 @@ chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: sschlansker@opentable.com' >> /etc/aliases
 echo 'export http_proxy=$http_proxy' > /etc/profile.d/http-proxy.sh
-echo 'proxy=$http_proxy' >> $ROOT_DIR/etc/yum.conf
+echo 'proxy=$http_proxy' >> /etc/yum.conf
 sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
 newaliases
 SETUP
