@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -o errexit -o nounset -o xtrace
+export http_proxy='http://54.193.106.53:3128'
 
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=`mktemp -d`
@@ -15,12 +16,11 @@ rpm --rebuilddb --root=$ROOT_DIR
 
 rpm -i --root=$ROOT_DIR --nodeps $RELEASE_RPM
 
-yum --installroot=$ROOT_DIR -y install yum
-echo 'proxy=http://54.193.106.53:3128' >> $ROOT_DIR/etc/yum.conf
 yum --installroot=$ROOT_DIR -y groupinstall core
 yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
-  openssh-clients strace pax tar 
+  openssh-clients strace pax tar
+echo "proxy=$http_proxy" >> $ROOT_DIR/etc/yum.conf
 
 # System and network config
 cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
