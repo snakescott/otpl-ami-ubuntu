@@ -23,11 +23,12 @@ cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
-yum --installroot=$ROOT_DIR -y groupinstall core
-yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
+YUM="yum --disableplugin=fastestmirror"
+
+$YUM --installroot=$ROOT_DIR -y groupinstall core
+$YUM --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar yum-utils
-echo "proxy=$http_proxy" >> $ROOT_DIR/etc/yum.conf
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
@@ -46,6 +47,9 @@ chkconfig --add get-ssh-key
 chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: sschlansker@opentable.com' >> /etc/aliases
+echo 'export http_proxy=$http_proxy' > /etc/profile.d/http-proxy.sh
+echo 'proxy=$http_proxy' >> $ROOT_DIR/etc/yum.conf
+sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
 newaliases
 SETUP
 chmod +x tmp/init-setup.sh
