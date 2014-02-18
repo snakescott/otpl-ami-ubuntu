@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
+
+set -o errexit -o nounset -o xtrace
 
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=`mktemp -d`
