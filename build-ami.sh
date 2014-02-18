@@ -39,9 +39,10 @@ ln -s 'menu.lst' boot/grub/menu.lst
 cp $SCRIPT_DIR/init.d/* etc/init.d/
 
 cat > tmp/init-setup.sh <<SETUP
-lokkit -p ssh:tcp
 chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
+chkconfig iptables off
+chkconfig ip6tables off
 echo 'root: sschlansker@opentable.com' >> /etc/aliases
 SETUP
 chmod +x tmp/init-setup.sh
