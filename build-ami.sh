@@ -25,8 +25,8 @@ cp /var/lib/random-seed var/lib/random-seed
 
 yum --installroot=$ROOT_DIR -y groupinstall core
 yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
-  openssl redhat-lsb at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
-  openssh-clients strace pax tar
+  openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
+  openssh-clients strace pax tar yum-utils
 echo "proxy=$http_proxy" >> $ROOT_DIR/etc/yum.conf
 
 # Useful utility for cron jobs
