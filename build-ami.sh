@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-SCRIPT_DIR=`dirname $0`
+SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=`mktemp -d`
 IMAGE_NAME='testimage'
 RELEASE_RPM='http://mirror.centos.org/centos/6.5/os/x86_64/Packages/centos-release-6-5.el6.centos.11.1.x86_64.rpm'
