@@ -21,6 +21,7 @@ mkdir -p etc/sysconfig/{network-scripts,selinux}
 cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
 cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
+cp /var/lib/random-seed var/lib/random-seed
 
 yum --installroot=$ROOT_DIR -y groupinstall core
 yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
