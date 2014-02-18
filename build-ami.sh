@@ -23,10 +23,9 @@ cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
-YUM="yum --disableplugin=fastestmirror"
+YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -y"
 
-$YUM --installroot=$ROOT_DIR -y groupinstall core
-$YUM --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
+$YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar yum-utils
 
