@@ -64,10 +64,10 @@ chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
 
-#ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem \
-#  -r x86_64 -u 6708-2490-4290 --no-inherit --kernel aki-880531cd --fstab root/etc/fstab \
-#  -v /srv/packaging/root -p centos65-base -B "ami=sda1,root=/dev/sda1,ephemeral0=sda2,swap=sda3"
+ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem \
+  -r x86_64 -u 6708-2490-4290 --no-inherit --kernel aki-880531cd --fstab $SCRIPT_DIR/fstab \
+  -v $ROOT_DIR -p $IMAGE_NAME -B "ami=sda1,root=/dev/sda1,ephemeral0=sda2,swap=sda3"
 
-#ec2-upload-bundle -b sschlansker-ami -m /tmp/centos65-base.manifest.xml \
-#  -a 'AKIAI7XWEKUIRBFOGLAQ' -s 'rCdxyC6vikhSPGj84/3BqkP4EXeQG7nT0Sd5myfI'
+ec2-upload-bundle -b sschlansker-ami -m /tmp/$IMAGE_NAME.manifest.xml \
+  -a 'AKIAI7XWEKUIRBFOGLAQ' -s 'rCdxyC6vikhSPGj84/3BqkP4EXeQG7nT0Sd5myfI'
 
