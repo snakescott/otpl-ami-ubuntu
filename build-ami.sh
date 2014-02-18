@@ -23,8 +23,7 @@ cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
-sed -i 's/mirrorlist=/#mirrorlist=/g' etc/yum.repos.d/CentOS-Base.repo
-sed -i 's/#baseurl=/baseurl=/g' etc/yum.repos.d/CentOS-Base.repo
+sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.repos.d/CentOS-Base.repo
 
 YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -y"
 
