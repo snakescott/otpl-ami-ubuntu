@@ -35,14 +35,14 @@ $YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 
 # Grub config
-cp $SCRIPT_DIR/grub.conf boot/grub/grub.conf
+KERN_VERS=$(basename $ROOT_DIR/boot/vmlinuz-*)
+RAMFS_VERS=$(basename $ROOT_DIR/boot/initramfs-*)
+sed -e 's/KERN/$KERN_VERS/' -e 's/RAMFS/$RAMFS_VERS/' < $SCRIPT_DIR/grub.conf > boot/grub/grub.conf
 ln -s '../boot/grub/grub.conf' etc/grub.conf
 ln -s 'grub.conf' boot/grub/menu.lst
 
 cp $SCRIPT_DIR/init.d/* etc/init.d/
 
-KERN_VERS=$(basename $ROOT_DIR/boot/vmlinuz-*)
-RAMFS_VERS=$(basename $ROOT_DIR/boot/initramfs-*)
 
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
@@ -54,7 +54,6 @@ echo 'root: sschlansker@opentable.com' >> /etc/aliases
 echo 'export http_proxy=$http_proxy' > /etc/profile.d/http-proxy.sh
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
-grubby --add-kernel=/boot/$KERN_VERS --initrd=/boot/$RAMFS_VERS --make-default --title=CentOS --args="root=/dev/xvde1 LANG=en_US.UTF-8 crashkernel=auto"
 newaliases
 SETUP
 chmod +x tmp/init-setup.sh
