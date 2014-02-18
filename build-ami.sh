@@ -13,8 +13,10 @@ rpm --rebuilddb --root=$ROOT_DIR
 
 rpm -i --root=$ROOT_DIR --nodeps $RELEASE_RPM
 
-yum --installroot=$ROOT_DIR groupinstall core base "Server Platform"
-yum --installroot=$ROOT_DIR install wget git curl man zsh rsync screen irqbalance
+yum --installroot=$ROOT_DIR -y groupinstall core
+yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
+  openssl redhat-lsb at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
+  openssh-clients strace pax tar 
 
 # System and network config
 cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
