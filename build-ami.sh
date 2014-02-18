@@ -16,16 +16,17 @@ rpm --rebuilddb --root=$ROOT_DIR
 
 rpm -i --root=$ROOT_DIR --nodeps $RELEASE_RPM
 
+# System and network config
+mkdir -p etc/sysconfig/{network-scripts,selinux}
+cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
+cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
+cp $SCRIPT_DIR/fstab etc/fstab
+
 yum --installroot=$ROOT_DIR -y groupinstall core
 yum --installroot=$ROOT_DIR -y install wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar
 echo "proxy=$http_proxy" >> $ROOT_DIR/etc/yum.conf
-
-# System and network config
-cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
-cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
-cp $SCRIPT_DIR/fstab etc/fstab
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
