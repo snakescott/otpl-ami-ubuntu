@@ -32,7 +32,6 @@ $YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
 
 # Disable SELinux
 cp $SCRIPT_DIR/sysconfig/selinux etc/selinux/config
-ln -s '../selinux/config' etc/sysconfig/selinux
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
