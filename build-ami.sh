@@ -61,4 +61,3 @@ rm tmp/init-setup.sh
 #ec2-upload-bundle -b sschlansker-ami -m /tmp/centos65-base.manifest.xml \
 #  -a 'AKIAI7XWEKUIRBFOGLAQ' -s 'rCdxyC6vikhSPGj84/3BqkP4EXeQG7nT0Sd5myfI'
 
-# ENSURE MAIL ALIASES FOR ROOT WORKS
