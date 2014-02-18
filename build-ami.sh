@@ -37,7 +37,7 @@ cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 # Grub config
 KERN_VERS=$(basename $ROOT_DIR/boot/vmlinuz-*)
 RAMFS_VERS=$(basename $ROOT_DIR/boot/initramfs-*)
-sed -e 's/KERN/$KERN_VERS/' -e 's/RAMFS/$RAMFS_VERS/' < $SCRIPT_DIR/grub.conf > boot/grub/grub.conf
+sed -e "s/KERN/$KERN_VERS/" -e "s/RAMFS/$RAMFS_VERS/" < $SCRIPT_DIR/grub.conf > boot/grub/grub.conf
 ln -s '../boot/grub/grub.conf' etc/grub.conf
 ln -s 'grub.conf' boot/grub/menu.lst
 
@@ -61,6 +61,7 @@ chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
+rm /tmp/$IMAGE_NAME
 
 ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem \
   -r x86_64 -u 6708-2490-4290 --no-inherit --kernel aki-880531cd --fstab $SCRIPT_DIR/fstab \
