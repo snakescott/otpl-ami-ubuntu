@@ -19,7 +19,6 @@ rpm -i --root=$ROOT_DIR --nodeps $RELEASE_RPM
 # System and network config
 mkdir -p etc/sysconfig/{network-scripts,selinux}
 cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
-cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
@@ -30,6 +29,10 @@ YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -y"
 $YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar yum-utils
+
+# Disable SELinux
+cp $SCRIPT_DIR/sysconfig/selinux etc/selinux/config
+ln -s '../selinux/config' etc/sysconfig/selinux
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
@@ -61,7 +64,7 @@ chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
-rm /tmp/$IMAGE_NAME
+rm -f /tmp/$IMAGE_NAME
 
 ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem \
   -r x86_64 -u 6708-2490-4290 --no-inherit --kernel aki-880531cd --fstab $SCRIPT_DIR/fstab \
