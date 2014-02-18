@@ -46,6 +46,7 @@ chkconfig --add get-ssh-key
 chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: sschlansker@opentable.com' >> /etc/aliases
+newaliases
 SETUP
 chmod +x tmp/init-setup.sh
 
