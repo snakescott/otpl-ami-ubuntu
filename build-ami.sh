@@ -25,6 +25,9 @@ cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
 cp $SCRIPT_DIR/sysconfig/selinux etc/sysconfig/selinux
 cp $SCRIPT_DIR/fstab etc/fstab
 
+# Useful utility for cron jobs
+cp $SCRIPT_DIR/cronic usr/local/bin/cronic
+
 # Grub config
 cp $SCRIPT_DIR/grub.conf boot/grub/grub.conf
 ln -s '../boot/grub/grub.conf' etc/grub.conf
