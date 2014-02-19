@@ -28,7 +28,7 @@ YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -y"
 
 $YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
-  openssh-clients strace pax tar yum-utils
+  openssh-clients strace pax tar yum-utils nc
 
 # Disable SELinux
 cp $SCRIPT_DIR/sysconfig/selinux etc/selinux/config
