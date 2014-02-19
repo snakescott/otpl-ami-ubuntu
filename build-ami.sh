@@ -72,3 +72,4 @@ ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZD
 ec2-upload-bundle -b sschlansker-ami -m /tmp/$IMAGE_NAME.manifest.xml \
   -a 'AKIAI7XWEKUIRBFOGLAQ' -s 'rCdxyC6vikhSPGj84/3BqkP4EXeQG7nT0Sd5myfI'
 
+rm -rf $ROOT_DIR
