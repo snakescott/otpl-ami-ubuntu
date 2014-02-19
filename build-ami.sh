@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -o errexit -o nounset -o xtrace
-export http_proxy='http://54.193.106.53:3128'
+export http_proxy='http://54.193.23.200:3128'
 
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=`mktemp -d`
