@@ -53,7 +53,6 @@ chkconfig --add get-ssh-key
 chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: sschlansker@opentable.com' >> /etc/aliases
-echo 'export http_proxy=$http_proxy' > /etc/profile.d/http-proxy.sh
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 echo 'NETWORKING=yes' > /etc/sysconfig/network
 sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
