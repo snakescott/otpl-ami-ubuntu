@@ -69,7 +69,7 @@ sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.rep
 
 YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -q -y"
 
-$YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
+$YUM install @core mdadm wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar yum-utils nc
 
@@ -94,6 +94,7 @@ chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
 chkconfig --add resize-filesystems
 chkconfig --add ephemeral0-swap
+chkconfig --add ephemeral123-raid
 chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
@@ -118,7 +119,7 @@ SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 wait_snapshot $SNAP_ID
 
 $EC2_BIN/ec2-create-tags $SNAP_ID --tag "Name=ami-$IMAGE_NAME"
-IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd | cut -f 2)
+IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-880531cd | cut -f 2)
 $EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 $EC2_BIN/ec2-delete-volume $VOL_ID
 
