@@ -26,10 +26,8 @@ function wait_file() {
 }
 
 function wait_snapshot() {
-  x=0
   echo "Waiting for snapshot $1 to complete..."
-  while [ "$x" -lt 20 -a ! $($EC2_BIN/ec2-describe-snapshots $1 | grep completed) ]; do
-    x=$((x+1))
+  while $EC2_BIN/ec2-describe-snapshots $1 | grep -v completed; do
     sleep 10
   done
 }
