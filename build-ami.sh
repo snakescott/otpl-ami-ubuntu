@@ -25,6 +25,7 @@ fi
 
 INSTANCE_ID=$($CURL http://169.254.169.254/latest/meta-data/instance-id)
 VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-1b | cut -f 2)
+$EC2_BIN/ec2-create-tags $VOL_ID --tag "Name=$IMAGE_NAME"
 $EC2_BIN/ec2-attach-volume $VOL_ID -i $INSTANCE_ID -d /dev/xvdz
 wait_file /dev/xvdz
 mkfs.ext4 -L ec2root /dev/xvdz
@@ -97,7 +98,8 @@ $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 echo "Sleeping 30 seconds to allow snapshot to complete"
 sleep 30
-$EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd
+IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd | cut -f 2)
+$EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME"
 $EC2_BIN/ec2-delete-volume $VOL_ID
 
 rmdir $ROOT_DIR
