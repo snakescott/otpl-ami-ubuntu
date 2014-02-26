@@ -100,6 +100,7 @@ rm tmp/init-setup.sh
 popd
 
 umount $ROOT_DIR
+sync
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 echo "Sleeping 30 seconds to allow snapshot to complete"
