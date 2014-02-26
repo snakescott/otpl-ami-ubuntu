@@ -3,12 +3,18 @@
 set -o errexit -o nounset -o xtrace
 export http_proxy='http://ec2-54-193-23-200.us-west-1.compute.amazonaws.com:3128'
 
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $0 image-name"
+  exit 1
+fi
+
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
-IMAGE_NAME='centos65-base'
+IMAGE_NAME=$1
 EC2_BIN=$EC2_HOME/bin/
 RELEASE_RPM='http://mirror.centos.org/centos/6.5/os/x86_64/Packages/centos-release-6-5.el6.centos.11.1.x86_64.rpm'
 CURL='curl -fsS'
+
 
 function wait_file() {
   x=0
