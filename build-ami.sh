@@ -4,9 +4,31 @@ set -o errexit -o nounset -o xtrace
 export http_proxy='http://ec2-54-193-23-200.us-west-1.compute.amazonaws.com:3128'
 
 SCRIPT_DIR=`pwd`/`dirname $0`
-ROOT_DIR=`mktemp -d`
+ROOT_DIR=$(mktemp -d)
 IMAGE_NAME='centos65-base'
+EC2_BIN=$EC2_HOME/bin/
 RELEASE_RPM='http://mirror.centos.org/centos/6.5/os/x86_64/Packages/centos-release-6-5.el6.centos.11.1.x86_64.rpm'
+CURL='curl -fsS'
+
+function wait_file() {
+  x=0
+  while [ "$x" -lt 100 -a ! -e $1 ]; do
+          x=$((x+1))
+          sleep .1
+  done
+}
+
+if [[ -e /dev/xvdz ]]; then
+  echo "/dev/xvdz is already assigned"
+  exit 1
+fi
+
+INSTANCE_ID=$($CURL http://169.254.169.254/latest/meta-data/instance-id)
+VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-1b | cut -f 2)
+$EC2_BIN/ec2-attach-volume $VOL_ID -i $INSTANCE_ID -d /dev/xvdz
+wait_file /dev/xvdz
+mkfs.ext4 -L ec2root /dev/xvdz
+mount /dev/xvdz $ROOT_DIR
 
 echo Building CentOS base image in $ROOT_DIR
 
@@ -23,6 +45,7 @@ cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
 # Keep AWS vars when a user runs sudo
+mkdir etc/sudoers.d/
 cp $SCRIPT_DIR/aws-sudo etc/sudoers.d/
 
 sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.repos.d/CentOS-Base.repo
@@ -66,13 +89,10 @@ chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
-rm -f /tmp/$IMAGE_NAME
 
-ec2-bundle-vol -c /tmp/cert-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem -k /tmp/pk-2LZDZL2CXYF7OXFL24KRJJ5DTXXLBQVA.pem \
-  -r x86_64 -u 6708-2490-4290 --no-inherit --kernel aki-880531cd --fstab $SCRIPT_DIR/fstab \
-  -v $ROOT_DIR -p $IMAGE_NAME -B "ami=sda1,root=/dev/sda1,ephemeral0=sda2,swap=sda3"
+umount $ROOT_DIR
+$EC2_BIN/ec2-detach-volume $VOL_ID
+SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -d ' ' -f 2)
+$EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd
 
-ec2-upload-bundle -b sschlansker-ami -m /tmp/$IMAGE_NAME.manifest.xml \
-  -a 'AKIAI7XWEKUIRBFOGLAQ' -s 'rCdxyC6vikhSPGj84/3BqkP4EXeQG7nT0Sd5myfI'
-
-rm -rf $ROOT_DIR
+rmdir $ROOT_DIR
