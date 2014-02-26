@@ -7,7 +7,7 @@ to be the platform of choice currently.
 
 ## Requirements
 
-The CentOS builder requires `rpm` and the ec2 toolset.
+The CentOS builder requires `rpm` and the ec2 toolset.  Most testing is done from within ec2 itself, so that is the supported environment to run this script in.
 
 ## Produces
 
