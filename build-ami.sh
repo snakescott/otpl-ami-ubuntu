@@ -85,7 +85,7 @@ chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
 chkconfig iptables off
 chkconfig ip6tables off
-echo 'root: sschlansker@opentable.com' >> /etc/aliases
+echo 'root: ec2-root@opentable.com' >> /etc/aliases
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 echo 'NETWORKING=yes' > /etc/sysconfig/network
 sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
