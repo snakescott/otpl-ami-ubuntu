@@ -88,14 +88,14 @@ ln -s 'grub.conf' boot/grub/menu.lst
 
 cp $SCRIPT_DIR/init.d/* etc/init.d/
 
-
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset
 chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
+chkconfig --add resize-filesystems
+chkconfig --add ephemeral0-swap
 chkconfig iptables off
 chkconfig ip6tables off
-chkconfig resize-filesystems on
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 echo 'NETWORKING=yes' > /etc/sysconfig/network

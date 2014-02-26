@@ -1,0 +1,28 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          ephemeral0-swap
+# Required-Start:    $local_fs $syslog $all
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      
+# Short-Description: Mount ephemeral0 as swap
+# Description:       Mount ephemeral0 as swap
+#
+### END INIT INFO
+
+DEV=$(curl -fsS http://169.254.169.254/latest/meta-data/block-device-mapping/ephemeral0)
+
+if [ $? -ne 0 ]; then
+  echo "No swap to enable"
+  exit 0
+fi
+
+if [ ! -z "$DEV" ]; then
+  echo "Enabling swap on /dev/$DEV"
+  mkswap -L ec2swap /dev/$DEV
+  swapon /dev/$DEV
+else
+  echo "Failed to retrieve instance metadata"
+  exit 1
+fi
