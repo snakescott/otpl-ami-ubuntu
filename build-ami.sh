@@ -57,7 +57,7 @@ cp $SCRIPT_DIR/aws-sudo etc/sudoers.d/
 
 sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.repos.d/CentOS-Base.repo
 
-YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -y"
+YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -q -y"
 
 $YUM install @core wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
