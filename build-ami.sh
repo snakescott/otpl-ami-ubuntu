@@ -32,7 +32,7 @@ mount /dev/xvdz $ROOT_DIR
 
 echo Building CentOS base image in $ROOT_DIR
 
-cd $ROOT_DIR
+pushd $ROOT_DIR
 mkdir -p var/lib/rpm
 rpm --rebuilddb --root=$ROOT_DIR
 
@@ -89,6 +89,8 @@ chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
+
+popd
 
 umount $ROOT_DIR
 $EC2_BIN/ec2-detach-volume $VOL_ID
