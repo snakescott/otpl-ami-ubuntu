@@ -15,6 +15,7 @@ EC2_BIN=$EC2_HOME/bin/
 RELEASE_RPM='http://mirror.centos.org/centos/6.5/os/x86_64/Packages/centos-release-6-5.el6.centos.11.1.x86_64.rpm'
 CURL='curl -fsS'
 
+echo Building CentOS base image in $ROOT_DIR
 
 function wait_file() {
   x=0
@@ -46,7 +47,6 @@ wait_file /dev/xvdz
 mkfs.ext4 -q -L ec2root /dev/xvdz
 mount /dev/xvdz $ROOT_DIR
 
-echo Building CentOS base image in $ROOT_DIR
 
 pushd $ROOT_DIR
 mkdir -p var/lib/rpm
