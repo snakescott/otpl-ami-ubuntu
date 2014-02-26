@@ -43,7 +43,7 @@ VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-1b | cut -f 2)
 $EC2_BIN/ec2-create-tags $VOL_ID --tag "Name=$IMAGE_NAME"
 $EC2_BIN/ec2-attach-volume $VOL_ID -i $INSTANCE_ID -d /dev/xvdz
 wait_file /dev/xvdz
-mkfs.ext4 -L ec2root /dev/xvdz
+mkfs.ext4 -q -L ec2root /dev/xvdz
 mount /dev/xvdz $ROOT_DIR
 
 echo Building CentOS base image in $ROOT_DIR
