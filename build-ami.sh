@@ -94,7 +94,10 @@ popd
 
 umount $ROOT_DIR
 $EC2_BIN/ec2-detach-volume $VOL_ID
-SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -d ' ' -f 2)
+SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
+echo "Sleeping 30 seconds to allow snapshot to complete"
+sleep 30
 $EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd
+$EC2_BIN/ec2-delete-volume $VOL_ID
 
 rmdir $ROOT_DIR
