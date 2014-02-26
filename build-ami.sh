@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o errexit -o nounset -o xtrace
+set -o errexit -o nounset
 export http_proxy='http://ec2-54-193-23-200.us-west-1.compute.amazonaws.com:3128'
 
 if [[ $# -eq 0 ]]; then
