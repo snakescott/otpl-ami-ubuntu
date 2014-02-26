@@ -116,6 +116,7 @@ SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 
 wait_snapshot $SNAP_ID
 
+$EC2_BIN/ec2-create-tags $SNAP_ID --tag "Name=ami-$IMAGE_NAME"
 IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd | cut -f 2)
 $EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 $EC2_BIN/ec2-delete-volume $VOL_ID
