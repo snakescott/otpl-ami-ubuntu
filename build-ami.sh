@@ -48,7 +48,7 @@ mkfs.ext4 -q -L ec2root /dev/xvdz
 mount /dev/xvdz $ROOT_DIR
 
 
-pushd $ROOT_DIR
+cd $ROOT_DIR
 mkdir -p var/lib/rpm
 rpm --rebuilddb --root=$ROOT_DIR
 
@@ -107,7 +107,7 @@ chroot $ROOT_DIR /tmp/init-setup.sh
 
 rm tmp/init-setup.sh
 
-popd
+cd
 
 umount $ROOT_DIR
 sync
