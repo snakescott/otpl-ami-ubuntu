@@ -58,6 +58,9 @@ cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
 cp $SCRIPT_DIR/fstab etc/fstab
 cp /var/lib/random-seed var/lib/random-seed
 
+# Cgroup mountpoint
+mkdir cgroup
+
 # Keep AWS vars when a user runs sudo
 mkdir etc/sudoers.d/
 cp $SCRIPT_DIR/aws-sudo etc/sudoers.d/
