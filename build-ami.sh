@@ -24,6 +24,15 @@ function wait_file() {
   done
 }
 
+function wait_snapshot() {
+  x=0
+  echo "Waiting for snapshot $1 to complete..."
+  while [ "$x" -lt 20 -a ! $(ec2-describe-snapshot $1 | grep completed) ]; do
+    x=$((x+1))
+    sleep 10
+  done
+}
+
 if [[ -e /dev/xvdz ]]; then
   echo "/dev/xvdz is already assigned"
   exit 1
@@ -103,8 +112,9 @@ umount $ROOT_DIR
 sync
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
-echo "Sleeping 30 seconds to allow snapshot to complete"
-sleep 30
+
+wait_snapshot $SNAP_ID
+
 IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' --kernel aki-880531cd | cut -f 2)
 $EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 $EC2_BIN/ec2-delete-volume $VOL_ID
