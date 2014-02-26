@@ -94,6 +94,7 @@ chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
 chkconfig iptables off
 chkconfig ip6tables off
+chkconfig resize-filesystems on
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 echo 'NETWORKING=yes' > /etc/sysconfig/network
