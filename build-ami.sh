@@ -3,7 +3,7 @@
 set -o errexit -o nounset
 export http_proxy='http://ec2-54-193-23-200.us-west-1.compute.amazonaws.com:3128'
 
-if [[ $# -eq 0 ]]; then
+if [ $# -eq 0 ]; then
   echo "Usage: $0 image-name"
   exit 1
 fi
@@ -37,7 +37,7 @@ function wait_snapshot() {
   done
 }
 
-if [[ -e /dev/xvdz ]]; then
+if [ -e /dev/xvdz ]; then
   echo "/dev/xvdz is already assigned"
   exit 1
 fi
