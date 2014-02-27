@@ -8,6 +8,11 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
+if [ $(id -u) -ne 0 ]; then
+  echo "You must be root to run this script"
+  exit 1
+fi
+
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
 IMAGE_NAME=$1
