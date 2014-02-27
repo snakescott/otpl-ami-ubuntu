@@ -1,0 +1,37 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          ephemeral0-swap
+# Required-Start:    $local_fs $syslog $all
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      
+# Short-Description: Mount ephemeral disks as swap and storage
+# Description:       Mount ephemeral disks as swap and storage
+#
+### END INIT INFO
+
+DEVS=""
+devcount=0
+
+for dev in $(curl -fsS http://169.254.169.254/latest/meta-data/block-device-mapping/ | grep ephemeral)
+do
+  DEVICE=/dev/$(curl -fsS http://169.254.169.254/latest/meta-data/block-device-mapping/$dev)
+  DEVS="$DEVS $DEVICE"
+  devcount=$((devcount+1))
+done
+
+if [ $devcount -gt 0 ]; then
+  echo "Enabling ephemeral store on $devcount volumes: '$DEVS'"
+  pvcreate $DEVS
+  vgcreate vg_ephemeral $DEVS
+  lvcreate -L 32G -n lv_swap vg_ephemeral
+  lvcreate -l 100%FREE -n lv_ephemeral vg_ephemeral
+  mkswap -L ec2swap /dev/vg_ephemeral/lv_swap
+  swapon /dev/vg_ephemeral/lv_swap
+  mkfs.ext4 -q -O^has_journal -L ec2ephemeral /dev/vg_ephemeral/lv_ephemeral
+  mkdir -p /ephemeral
+  mount -t ext4 -o async,noatime /dev/vg_ephemeral/lv_ephemeral /ephemeral
+else
+  echo "No ephemeral stores to RAID"
+fi

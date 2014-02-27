@@ -74,7 +74,7 @@ sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.rep
 
 YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -q -y"
 
-$YUM install @core mdadm wget git curl man zsh rsync screen irqbalance glibc nss \
+$YUM install @core lvm2 wget git curl man zsh rsync screen irqbalance glibc nss \
   openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
   openssh-clients strace pax tar yum-utils nc
 
@@ -98,8 +98,7 @@ set -o errexit -o nounset
 chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
 chkconfig --add resize-filesystems
-chkconfig --add ephemeral0-swap
-chkconfig --add ephemeral123-raid
+chkconfig --add ephemeral-disks
 chkconfig iptables off
 chkconfig ip6tables off
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
