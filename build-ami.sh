@@ -95,6 +95,7 @@ cp $SCRIPT_DIR/init.d/* etc/init.d/
 
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset
+ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 chkconfig --add ec2-run-user-data
 chkconfig --add get-ssh-key
 chkconfig --add resize-filesystems
