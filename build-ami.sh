@@ -101,6 +101,7 @@ chkconfig --add resize-filesystems
 chkconfig --add ephemeral-disks
 chkconfig iptables off
 chkconfig ip6tables off
+chkconfig ntpd on
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
 echo 'proxy=$http_proxy' >> /etc/yum.conf
 echo 'NETWORKING=yes' > /etc/sysconfig/network
