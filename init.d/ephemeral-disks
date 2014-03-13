@@ -25,12 +25,13 @@ if [ $devcount -gt 0 ]; then
   pvcreate $DEVS
   vgcreate vg_ephemeral $DEVS
   lvcreate -L 4G -n lv_swap vg_ephemeral
-  lvcreate -l 100%FREE -n lv_ephemeral vg_ephemeral
   mkswap -L ec2swap /dev/vg_ephemeral/lv_swap
-  swapon /dev/vg_ephemeral/lv_swap
+  swapon /dev/vg_ephemeral/lv_swap &
+  lvcreate -L 16G -n lv_ephemeral vg_ephemeral
   mkfs.ext4 -q -O^has_journal -L ec2ephemeral /dev/vg_ephemeral/lv_ephemeral
   mkdir -p /ephemeral
   mount -t ext4 -o async,noatime /dev/vg_ephemeral/lv_ephemeral /ephemeral
+  lvresize -l 100%FREE -r vg_ephemeral/lv_ephemeral &
 else
   echo "No ephemeral stores to RAID"
 fi
