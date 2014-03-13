@@ -17,8 +17,7 @@ devcount=0
 for dev in $(curl -fsS http://169.254.169.254/latest/meta-data/block-device-mapping/ | grep ephemeral)
 do
   DEVICE=/dev/$(curl -fsS http://169.254.169.254/latest/meta-data/block-device-mapping/$dev)
-  DEVS="$DEVS $DEVICE"
-  devcount=$((devcount+1))
+  [ -e $DEVICE ] && DEVS="$DEVS $DEVICE" && devcount=$((devcount+1))
 done
 
 if [ $devcount -gt 0 ]; then
