@@ -1,13 +1,10 @@
-# Opentable AMI: CentOS
+# Opentable AMI: Debian
 
-The CentOS base image is a minimal install of CentOS (currently 6.5)
-CentOS is used to host the transitional Ness platform.  There is intention to build a
-otpl-ami-debian component (which encompasses Ubuntu) in the near future since that seems
-to be the platform of choice currently.
+This base image is a minimal install of Debian or Ubuntu.
 
 ## Requirements
 
-The CentOS builder requires `rpm` and the ec2 toolset.  Most testing is done from within ec2 itself, so that is the supported environment to run this script in.
+The Debian builder requires `debootstrap` and the ec2 toolset.  Most testing is done from within ec2 itself, so that is the supported environment to run this script in.
 
 ## Produces
 

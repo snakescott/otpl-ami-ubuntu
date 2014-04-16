@@ -1,10 +1,9 @@
 #!/bin/bash
 
 set -o errexit -o nounset
-export http_proxy='http://ec2-54-193-23-200.us-west-1.compute.amazonaws.com:3128'
 
 if [ $# -eq 0 ]; then
-  echo "Usage: $0 image-name"
+  echo "Usage: $0 image-name release-name"
   exit 1
 fi
 
@@ -16,11 +15,11 @@ fi
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
 IMAGE_NAME=$1
+RELEASE=$2
 EC2_BIN=$EC2_HOME/bin/
-RELEASE_RPM='http://mirror.centos.org/centos/6.5/os/x86_64/Packages/centos-release-6-5.el6.centos.11.1.x86_64.rpm'
 CURL='curl -fsS'
 
-echo Building CentOS base image in $ROOT_DIR
+echo "Building $RELEASE base image in $ROOT_DIR, named $IMAGE_NAME"
 
 function wait_file() {
   x=0
@@ -43,7 +42,7 @@ if [ -e /dev/xvdz ]; then
 fi
 
 INSTANCE_ID=$($CURL http://169.254.169.254/latest/meta-data/instance-id)
-VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-1b | cut -f 2)
+VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-2c | cut -f 2)
 $EC2_BIN/ec2-create-tags $VOL_ID --tag "Name=$IMAGE_NAME"
 $EC2_BIN/ec2-attach-volume $VOL_ID -i $INSTANCE_ID -d /dev/xvdz
 wait_file /dev/xvdz
@@ -52,72 +51,49 @@ mount /dev/xvdz $ROOT_DIR
 
 
 cd $ROOT_DIR
-mkdir -p var/lib/rpm
-rpm --rebuilddb --root=$ROOT_DIR
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
-rpm -i --root=$ROOT_DIR --nodeps $RELEASE_RPM
+mount -o bind /sys sys
+mount -o bind /proc proc
+mount -o bind /dev dev
+
 
 # System and network config
-mkdir -p etc/sysconfig/{network-scripts,selinux}
-cp $SCRIPT_DIR/sysconfig/ifcfg-eth* etc/sysconfig/network-scripts/
+cat $SCRIPT_DIR/config/eth*.cfg >> etc/network/interfaces
 cp $SCRIPT_DIR/fstab etc/fstab
-cp /var/lib/random-seed var/lib/random-seed
-
-# Cgroup mountpoint
-mkdir cgroup
 
 # Keep AWS vars when a user runs sudo
-mkdir etc/sudoers.d/
 cp $SCRIPT_DIR/aws-sudo etc/sudoers.d/
-
-sed -i -e 's/mirrorlist=/#mirrorlist=/g' -e 's/#baseurl=/baseurl=/g' etc/yum.repos.d/CentOS-Base.repo
-
-YUM="yum --disableplugin=fastestmirror --installroot=$ROOT_DIR -q -y"
-
-$YUM install @core lvm2 wget git curl man zsh rsync screen irqbalance glibc nss \
-  openssl redhat-lsb-core at bind-utils file lsof man ethtool man-pages mlocate nano ntp ntpdate \
-  openssh-clients strace pax tar yum-utils nc
-
-# Disable SELinux
-cp $SCRIPT_DIR/sysconfig/selinux etc/selinux/config
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 
-# Grub config
-KERN_VERS=$(basename $ROOT_DIR/boot/vmlinuz-*)
-RAMFS_VERS=$(basename $ROOT_DIR/boot/initramfs-*)
-sed -e "s/KERN/$KERN_VERS/" -e "s/RAMFS/$RAMFS_VERS/" < $SCRIPT_DIR/grub.conf > boot/grub/grub.conf
-ln -s '../boot/grub/grub.conf' etc/grub.conf
-ln -s 'grub.conf' boot/grub/menu.lst
-
-cp $SCRIPT_DIR/init.d/* etc/init.d/
-
 cat > tmp/init-setup.sh <<SETUP
-set -o errexit -o nounset
-ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-chkconfig --add ec2-run-user-data
-chkconfig --add get-ssh-key
-chkconfig --add resize-filesystems
-chkconfig --add ephemeral-disks
-chkconfig iptables off
-chkconfig ip6tables off
-chkconfig ntpd on
+set -o errexit -o nounset -o xtrace
+
+locale-gen en_US en_US.UTF-8
+dpkg-reconfigure locales
+
+mkdir -p /boot/grub
+update-grub
+sed -i.bak 's/# defoptions=quiet splash/# defoptions=/' /boot/grub/menu.lst
+sed -i.bak 's/# groot=(hd0,0)/# groot=(hd0)/' /boot/grub/menu.lst
+rm /boot/grub/menu.lst.bak
+update-grub
+
+update-rc.d -f hwclock.sh remove
+update-rc.d -f hwclockfirst.sh remove
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
-echo 'proxy=$http_proxy' >> /etc/yum.conf
-echo 'NETWORKING=yes' > /etc/sysconfig/network
-sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
 newaliases
 SETUP
+
 chmod +x tmp/init-setup.sh
-
 chroot $ROOT_DIR /tmp/init-setup.sh
-
 rm tmp/init-setup.sh
 
 cd
 
-umount $ROOT_DIR
+umount ${ROOT_DIR}{/sys,/proc,/dev,/}
 sync
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
@@ -125,7 +101,7 @@ SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 wait_snapshot $SNAP_ID
 
 $EC2_BIN/ec2-create-tags $SNAP_ID --tag "Name=ami-$IMAGE_NAME"
-IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-880531cd | cut -f 2)
+IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-fc8f11cc | cut -f 2)
 $EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 $EC2_BIN/ec2-delete-volume $VOL_ID
 
