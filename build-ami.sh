@@ -96,7 +96,7 @@ apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8
 apt-get update
 
 # install apparmor too to work around https://github.com/dotcloud/docker/issues/4734, this should eventually go away
-apt-get install -y lxc lxc-docker lxctl apparmor apparmor-profiles
+apt-get install -y lxc lxc-docker apparmor apparmor-profiles
 
 SETUP
 
