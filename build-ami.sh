@@ -79,7 +79,7 @@ dpkg-reconfigure locales
 
 mkdir -p /boot/grub
 update-grub
-sed -i.bak 's/# defoptions=quiet splash/# defoptions=/' /boot/grub/menu.lst
+sed -i.bak 's/# defoptions=quiet splash/# defoptions=cgroup_enable=memory swapaccount=1/' /boot/grub/menu.lst
 sed -i.bak 's/# groot=(hd0,0)/# groot=(hd0)/' /boot/grub/menu.lst
 rm /boot/grub/menu.lst.bak
 update-grub
