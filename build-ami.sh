@@ -71,6 +71,15 @@ cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 # cloud-init
 cp $SCRIPT_DIR/cloud-init.d/* etc/cloud/cloud.cfg.d/
 
+# prevent daemons from starting in the chroot
+
+cat > usr/sbin/policy-rc.d <<EOF
+#!/bin/sh
+exit 101
+EOF
+
+chmod +x usr/sbin/policy-rc.d
+
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
 
@@ -102,7 +111,7 @@ SETUP
 
 chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
-rm tmp/init-setup.sh
+rm tmp/init-setup.sh usr/sbin/policy-rc.d
 
 cd
 
