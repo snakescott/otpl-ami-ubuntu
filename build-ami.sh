@@ -115,7 +115,7 @@ rm tmp/init-setup.sh usr/sbin/policy-rc.d
 
 cd
 
-umount ${ROOT_DIR}{/sys,/proc,/dev,/}
+umount -l ${ROOT_DIR}{/sys,/proc,/dev,/}
 sync
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
