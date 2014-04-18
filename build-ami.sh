@@ -60,13 +60,16 @@ mount -o bind /dev dev
 
 # System and network config
 cat $SCRIPT_DIR/config/eth*.cfg >> etc/network/interfaces
-cp $SCRIPT_DIR/fstab etc/fstab
+cp $SCRIPT_DIR/config/fstab etc/fstab
 
 # Keep AWS vars when a user runs sudo
-cp $SCRIPT_DIR/aws-sudo etc/sudoers.d/
+cp $SCRIPT_DIR/config/aws-sudo etc/sudoers.d/
 
 # Useful utility for cron jobs
 cp $SCRIPT_DIR/cronic usr/local/bin/cronic
+
+# cloud-init
+cp $SCRIPT_DIR/cloud-init.d/* etc/cloud/cloud.cfg.d/
 
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
