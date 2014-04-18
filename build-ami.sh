@@ -3,7 +3,7 @@
 set -o errexit -o nounset
 
 if [ $# -eq 0 ]; then
-  echo "Usage: $0 image-name release-name"
+  echo "Usage: $0 image-name"
   exit 1
 fi
 
@@ -15,7 +15,7 @@ fi
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
 IMAGE_NAME=$1
-RELEASE=$2
+RELEASE=trusty
 EC2_BIN=$EC2_HOME/bin/
 CURL='curl -fsS'
 
