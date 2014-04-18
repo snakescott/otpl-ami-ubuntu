@@ -117,6 +117,9 @@ cd
 
 umount -l ${ROOT_DIR}{/sys,/proc,/dev,/}
 sync
+
+rmdir $ROOT_DIR
+
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 
@@ -126,5 +129,3 @@ $EC2_BIN/ec2-create-tags $SNAP_ID --tag "Name=ami-$IMAGE_NAME"
 IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-fc8f11cc | cut -f 2)
 $EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 $EC2_BIN/ec2-delete-volume $VOL_ID
-
-rmdir $ROOT_DIR
