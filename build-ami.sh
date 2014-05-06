@@ -16,7 +16,6 @@ SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
 IMAGE_NAME=$1
 RELEASE=trusty
-EC2_BIN=$EC2_HOME/bin/
 CURL='curl -fsS'
 
 echo "Building $RELEASE base image in $ROOT_DIR, named $IMAGE_NAME"
@@ -42,9 +41,9 @@ if [ -e /dev/xvdz ]; then
 fi
 
 INSTANCE_ID=$($CURL http://169.254.169.254/latest/meta-data/instance-id)
-VOL_ID=$($EC2_BIN/ec2-create-volume -s 10 -z us-west-2c | cut -f 2)
-$EC2_BIN/ec2-create-tags $VOL_ID --tag "Name=$IMAGE_NAME"
-$EC2_BIN/ec2-attach-volume $VOL_ID -i $INSTANCE_ID -d /dev/xvdz
+VOL_ID=$(aws ec2 create-volume --size 10 --availability-zone us-west-2c | jq -r '.VolumeId')
+aws ec2 create-tags --resources $VOL_ID --tags "Key=Name,Value=$IMAGE_NAME"
+aws ec2 attach-volume --volume-id $VOL_ID --instance-id $INSTANCE_ID --device /dev/xvdz
 wait_file /dev/xvdz
 mkfs.ext4 -q -L ec2root /dev/xvdz
 mount /dev/xvdz $ROOT_DIR
@@ -118,14 +117,18 @@ cd
 umount -l ${ROOT_DIR}{/sys,/proc,/dev,/}
 sync
 
-rmdir $ROOT_DIR
+ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 1024 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda1,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd
+ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY --region $EC2_REGION -m /tmp/$IMAGE_NAME.manifest.xml --retry
+AMI=$(aws ec2 register-image --image-location $S3_BUCKET/$IMAGE_NAME --name $IMAGE_NAME --architecture x86_64 --kernel-id aki-fc8f11cc | jq -r .ImageId)
+aws ec2 create-tags --resources $AMI --tags "Key=Name,Value=$IMAGE_NAME" "Key=ot-base-image,Value=ubuntu"
 
 $EC2_BIN/ec2-detach-volume $VOL_ID
 SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
 
-wait_snapshot $SNAP_ID
+aws ec2 detach-volume --volume-id $VOL_ID
 
-$EC2_BIN/ec2-create-tags $SNAP_ID --tag "Name=ami-$IMAGE_NAME"
-IMAGE_ID=$($EC2_BIN/ec2-register -n $IMAGE_NAME -a x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-fc8f11cc | cut -f 2)
-$EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
-$EC2_BIN/ec2-delete-volume $VOL_ID
+#aws ec2 create-tags --resources $SNAP_ID --tags "Key=Name,Value=ami-$IMAGE_NAME"
+#IMAGE_ID=$(aws ec2 register-image --name $IMAGE_NAME --architecture x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-fc8f11cc | cut -f 2)
+#$EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
+aws ec2 delete-volume --volume-id $VOL_ID
+rm /tmp/$IMAGE_NAME*
