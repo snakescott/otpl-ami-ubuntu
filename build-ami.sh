@@ -18,20 +18,13 @@ IMAGE_NAME=$1
 RELEASE=trusty
 CURL='curl -fsS'
 
-echo "Building $RELEASE base image in $ROOT_DIR, named $IMAGE_NAME"
+echo "Building $RELEASE base image in $ROOT_DIR, named $IMAGE_NAME, uploading to $S3_BUCKET"
 
 function wait_file() {
   x=0
   while [ "$x" -lt 100 -a ! -e $1 ]; do
           x=$((x+1))
           sleep .1
-  done
-}
-
-function wait_snapshot() {
-  echo "Waiting for snapshot $1 to complete..."
-  while $EC2_BIN/ec2-describe-snapshots $1 | grep -v completed; do
-    sleep 10
   done
 }
 
@@ -50,7 +43,7 @@ mount /dev/xvdz $ROOT_DIR
 
 
 cd $ROOT_DIR
-debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
 mount -o bind /proc proc
@@ -79,6 +72,28 @@ EOF
 
 chmod +x usr/sbin/policy-rc.d
 
+cat > tmp/ami-tools.patch <<PATCH
+*** ec2-ami-tools-1.4.0.1/lib/ec2/platform/linux/image.rb.org   2011-10-19 17:45:16.000000000 +0900
+--- ec2-ami-tools-1.4.0.1/lib/ec2/platform/linux/image.rb       2011-10-19 17:45:55.000000000 +0900
+***************
+*** 276,282 ****
+              fstab_content = make_fstab
+              File.open( fstab, 'w' ) { |f| f.write( fstab_content ) }
+              puts "/etc/fstab:"
+!             fstab_content.each do |s|
+                puts "\t #{s}"
+              end
+            end
+--- 276,282 ----
+              fstab_content = make_fstab
+              File.open( fstab, 'w' ) { |f| f.write( fstab_content ) }
+              puts "/etc/fstab:"
+!             fstab_content.each_line do |s|
+                puts "\t #{s}"
+              end
+            end
+PATCH
+
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
 
@@ -87,6 +102,7 @@ dpkg-reconfigure locales
 
 mkdir -p /boot/grub
 update-grub -y
+sed -i.bak 's$# kopt=.*$# kopt=root=/dev/xvda1 ro$' /boot/grub/menu.lst
 sed -i.bak 's/# defoptions=quiet splash/# defoptions=cgroup_enable=memory swapaccount=1/' /boot/grub/menu.lst
 sed -i.bak 's/# groot=(hd0,0)/# groot=(hd0)/' /boot/grub/menu.lst
 rm /boot/grub/menu.lst.bak
@@ -106,6 +122,22 @@ apt-get update
 # install apparmor too to work around https://github.com/dotcloud/docker/issues/4734, this should eventually go away
 apt-get install -y lxc lxc-docker apparmor apparmor-profiles
 
+# install ec2-ami-tools
+
+cd /opt
+curl -sSfO http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
+unzip ec2-ami-tools.zip
+rm ec2-ami-tools.zip
+mv ec2-ami-tools-* ec2-ami-tools
+
+patch -p1 -d /opt/ec2-ami-tools -i /tmp/ami-tools.patch
+rm /tmp/ami-tools.patch
+
+echo 'export EC2_AMITOOL_HOME=/opt/ec2-ami-tools; export PATH=$PATH:$EC2_AMITOOL_HOME/bin' > /etc/profile.d/ami.sh
+chmod +x /etc/profile.d/ami.sh
+
+apt-get clean
+
 SETUP
 
 chmod +x tmp/init-setup.sh
@@ -114,7 +146,7 @@ rm tmp/init-setup.sh usr/sbin/policy-rc.d
 
 cd
 
-umount -l ${ROOT_DIR}{/sys,/proc,/dev,/}
+umount -l ${ROOT_DIR}{/sys,/proc,/dev}
 sync
 
 ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 1024 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda1,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd
@@ -122,13 +154,10 @@ ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY --region $
 AMI=$(aws ec2 register-image --image-location $S3_BUCKET/$IMAGE_NAME --name $IMAGE_NAME --architecture x86_64 --kernel-id aki-fc8f11cc | jq -r .ImageId)
 aws ec2 create-tags --resources $AMI --tags "Key=Name,Value=$IMAGE_NAME" "Key=ot-base-image,Value=ubuntu"
 
-$EC2_BIN/ec2-detach-volume $VOL_ID
-SNAP_ID=$($EC2_BIN/ec2-create-snapshot $VOL_ID | cut -f 2)
+umount $ROOT_DIR
+rmdir $ROOT_DIR
 
 aws ec2 detach-volume --volume-id $VOL_ID
-
-#aws ec2 create-tags --resources $SNAP_ID --tags "Key=Name,Value=ami-$IMAGE_NAME"
-#IMAGE_ID=$(aws ec2 register-image --name $IMAGE_NAME --architecture x86_64 -s $SNAP_ID --root-device-name /dev/xvda -b '/dev/xvdb=ephemeral0' -b '/dev/xvdc=ephemeral1' -b '/dev/xvdd=ephemeral2' -b '/dev/xvde=ephemeral3' --kernel aki-fc8f11cc | cut -f 2)
-#$EC2_BIN/ec2-create-tags $IMAGE_ID --tag "Name=$IMAGE_NAME" --tag ot-base-image
 aws ec2 delete-volume --volume-id $VOL_ID
+
 rm /tmp/$IMAGE_NAME*
