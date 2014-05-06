@@ -18,6 +18,7 @@ IMAGE_NAME=$1
 RELEASE=trusty
 CURL='curl -fsS'
 
+echo "AMI tools at $EC2_AMITOOL_HOME"
 echo "Building $RELEASE base image in $ROOT_DIR, named $IMAGE_NAME, uploading to $S3_BUCKET"
 
 function wait_file() {
@@ -149,8 +150,8 @@ cd
 umount -l ${ROOT_DIR}{/sys,/proc,/dev}
 sync
 
-ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 512 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda1,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd
-ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY --region $EC2_REGION -m /tmp/$IMAGE_NAME.manifest.xml --retry
+$EC2_AMITOOL_HOME/bin/ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 512 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda1,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd
+$EC2_AMITOOL_HOME/bin/ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY --region $EC2_REGION -m /tmp/$IMAGE_NAME.manifest.xml --retry
 AMI=$(aws ec2 register-image --image-location $S3_BUCKET/$IMAGE_NAME --name $IMAGE_NAME --architecture x86_64 --kernel-id aki-fc8f11cc | jq -r .ImageId)
 aws ec2 create-tags --resources $AMI --tags "Key=Name,Value=$IMAGE_NAME" "Key=ot-base-image,Value=ubuntu"
 
