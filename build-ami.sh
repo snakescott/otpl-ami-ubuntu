@@ -43,7 +43,7 @@ mount /dev/xvdz $ROOT_DIR
 
 
 cd $ROOT_DIR
-debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
 mount -o bind /proc proc
