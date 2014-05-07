@@ -39,7 +39,7 @@ VOL_ID=$(aws ec2 create-volume --size 10 --availability-zone us-west-2c | jq -r 
 aws ec2 create-tags --resources $VOL_ID --tags "Key=Name,Value=$IMAGE_NAME"
 aws ec2 attach-volume --volume-id $VOL_ID --instance-id $INSTANCE_ID --device /dev/xvdz
 wait_file /dev/xvdz
-mkfs.ext4 -q -L ec2root /dev/xvdz
+mkfs.ext3 -q -L ec2root /dev/xvdz
 mount /dev/xvdz $ROOT_DIR
 
 
@@ -103,7 +103,7 @@ dpkg-reconfigure locales
 
 mkdir -p /boot/grub
 update-grub -y
-sed -i.bak 's%# kopt=.*%# kopt=root=/dev/xvda1 ro%' /boot/grub/menu.lst
+sed -i.bak 's%# kopt=.*%# kopt=root=LABEL=ec2root ro%' /boot/grub/menu.lst
 sed -i.bak 's/# defoptions=quiet splash/# defoptions=cgroup_enable=memory swapaccount=1/' /boot/grub/menu.lst
 sed -i.bak 's/# groot=(hd0,0)/# groot=(hd0)/' /boot/grub/menu.lst
 rm /boot/grub/menu.lst.bak
