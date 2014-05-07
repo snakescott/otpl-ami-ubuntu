@@ -115,6 +115,8 @@ rm /tmp/ami-tools.patch
 echo 'export EC2_AMITOOL_HOME=/opt/ec2-ami-tools; export PATH=$PATH:$EC2_AMITOOL_HOME/bin' > /etc/profile.d/ami.sh
 chmod +x /etc/profile.d/ami.sh
 
+easy_install awscli
+
 apt-get clean
 
 SETUP
