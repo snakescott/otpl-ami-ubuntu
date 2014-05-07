@@ -158,6 +158,8 @@ AMI=$(aws ec2 register-image --image-location $S3_BUCKET/$IMAGE_NAME.manifest.xm
 echo "AMI is $AMI"
 aws ec2 create-tags --resources $AMI --tags "Key=Name,Value=$IMAGE_NAME" "Key=ot-base-image,Value=ubuntu"
 
+rm /tmp/$IMAGE_NAME*
+
 umount $ROOT_DIR
 rmdir $ROOT_DIR
 
@@ -165,5 +167,4 @@ aws ec2 detach-volume --volume-id $VOL_ID
 sleep 30
 aws ec2 delete-volume --volume-id $VOL_ID
 
-rm /tmp/$IMAGE_NAME*
 echo "Completed: $AMI"
