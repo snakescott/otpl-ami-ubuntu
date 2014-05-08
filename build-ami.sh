@@ -84,8 +84,7 @@ dpkg-reconfigure locales
 
 mkdir -p /boot/grub
 update-grub -y
-sed -i.bak 's%# kopt=.*%# kopt=root=/dev/xvda1 ro%' /boot/grub/menu.lst
-sed -i.bak 's/# defoptions=quiet splash/# defoptions=cgroup_enable=memory swapaccount=1/' /boot/grub/menu.lst
+sed -i.bak 's%# kopt=.*%# kopt=root=/dev/xvda1 ro cgroup_enable=memory swapaccount=1%' /boot/grub/menu.lst
 rm /boot/grub/menu.lst.bak
 update-grub
 
