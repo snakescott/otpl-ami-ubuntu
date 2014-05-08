@@ -2,8 +2,8 @@
 
 set -o errexit -o nounset
 
-if [ $# -eq 0 ]; then
-  echo "Usage: $0 image-name"
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 s3-bucket image-name"
   exit 1
 fi
 
@@ -14,7 +14,8 @@ fi
 
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
-IMAGE_NAME=$1
+S3_BUCKET=$1
+IMAGE_NAME=$2
 RELEASE=trusty
 CURL='curl -fsS'
 
