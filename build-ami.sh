@@ -12,6 +12,8 @@ if [ $(id -u) -ne 0 ]; then
   exit 1
 fi
 
+set -o xtrace
+
 SCRIPT_DIR=`pwd`/`dirname $0`
 ROOT_DIR=$(mktemp -d)
 S3_BUCKET=$1
