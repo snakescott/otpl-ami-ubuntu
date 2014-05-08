@@ -42,6 +42,9 @@ cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 # cloud-init
 cp $SCRIPT_DIR/cloud-init.d/* etc/cloud/cloud.cfg.d/
 
+mkdir -p etc/ot
+echo $IMAGE_NAME > etc/ot/base-image
+
 # prevent daemons from starting in the chroot
 
 cat > usr/sbin/policy-rc.d <<EOF
