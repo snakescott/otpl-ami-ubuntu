@@ -96,11 +96,17 @@ update-rc.d -f hwclockfirst.sh remove
 echo 'root: ec2-root@opentable.com' >> /etc/aliases
 newaliases
 
+# ensure we have access to our apt repos
+cloud-init single -n cc_apt_configure
+
 # install docker
 
 echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 apt-get update
+
+# install jq which can't be debootstrapped because it's in universe
+apt-get install -y jq
 
 # install apparmor too to work around https://github.com/dotcloud/docker/issues/4734, this should eventually go away
 apt-get install -y lxc lxc-docker apparmor apparmor-profiles
