@@ -45,6 +45,10 @@ cp $SCRIPT_DIR/cronic usr/local/bin/cronic
 # cloud-init
 cp $SCRIPT_DIR/cloud-init.d/* etc/cloud/cloud.cfg.d/
 
+# nsenter because ubuntu is dumb.
+# https://bugs.launchpad.net/ubuntu/+source/util-linux/+bug/1012081
+cp $SCRIPT_DIR/extras/nsenter usr/bin/nsenter
+
 mkdir -p etc/ot
 echo $IMAGE_NAME > etc/ot/base-image
 
