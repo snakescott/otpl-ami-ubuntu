@@ -134,6 +134,7 @@ chmod +x /etc/profile.d/ami.sh
 
 easy_install awscli
 
+apt-get autoremove
 apt-get clean
 
 SETUP
