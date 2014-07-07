@@ -23,7 +23,7 @@ CURL='curl -fsS'
 
 if [ $EC2_REGION = us-west-1 ]; then
   AKI="aki-880531cd"
-else if [ $EC2_REGION = us-west2- ]; then
+elif [ $EC2_REGION = us-west2- ]; then
   AKI="aki-fc8f11cc"
 else
   echo "Unknown region $EC2_REGION"
