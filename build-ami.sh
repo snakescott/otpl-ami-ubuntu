@@ -34,6 +34,14 @@ echo "AMI tools at $EC2_AMITOOL_HOME"
 echo "Building $RELEASE base image in $ROOT_DIR, kernel $AKI, named $IMAGE_NAME, uploading to $S3_BUCKET"
 
 cd $ROOT_DIR
+
+# https://gist.github.com/jpetazzo/6127116 Debian pro tips!
+mkdir -p etc/dpkg/dpkg.cfg.d etc/apt/apt.conf.d
+# this forces dpkg not to call sync() after package extraction and speeds up install
+echo "force-unsafe-io" > etc/dpkg/dpkg.cfg.d/02apt-speedup
+# we don't need an apt cache
+echo "Acquire::http {No-Cache=True;};" > etc/apt/apt.conf.d/no-cache
+
 debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
