@@ -160,6 +160,12 @@ chmod +x tmp/init-setup.sh
 chroot $ROOT_DIR /tmp/init-setup.sh
 rm tmp/init-setup.sh usr/sbin/policy-rc.d
 
+# Configure Docker daemon
+cat > etc/default/docker <<DOCKERCONF
+DOCKER_OPTS="-g /mnt/docker"
+export TMPDIR="/mnt/docker-tmp"
+DOCKERCONF
+
 cd
 
 umount -l ${ROOT_DIR}{/sys,/proc,/dev}
