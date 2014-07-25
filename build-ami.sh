@@ -162,6 +162,7 @@ rm tmp/init-setup.sh usr/sbin/policy-rc.d
 
 # Configure Docker daemon
 cat > etc/default/docker <<DOCKERCONF
+mkdir -p /mnt/docker /mnt/docker-tmp
 DOCKER_OPTS="-g /mnt/docker"
 export TMPDIR="/mnt/docker-tmp"
 DOCKERCONF
