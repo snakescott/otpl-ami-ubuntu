@@ -155,6 +155,7 @@ chmod +x /etc/profile.d/ami.sh
 
 easy_install awscli
 
+apt-get purge -y linux-image-3.13.0-24-generic
 apt-get autoremove
 apt-get clean
 
