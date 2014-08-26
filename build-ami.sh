@@ -42,7 +42,7 @@ echo "force-unsafe-io" > etc/dpkg/dpkg.cfg.d/02apt-speedup
 # we don't need an apt cache
 echo "Acquire::http {No-Cache=True;};" > etc/apt/apt.conf.d/no-cache
 
-debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc,btrfs-tools $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
 mount -o bind /proc proc
@@ -65,6 +65,10 @@ cp $SCRIPT_DIR/cloud-init.d/* etc/cloud/cloud.cfg.d/
 # nsenter because ubuntu is dumb.
 # https://bugs.launchpad.net/ubuntu/+source/util-linux/+bug/1012081
 cp $SCRIPT_DIR/extras/nsenter usr/bin/nsenter
+
+# btrfs configuration
+mkdir -p opt/bin/
+cp $SCRIPT_DIR/extras/init-btrfs.sh opt/bin/
 
 mkdir -p etc/ot
 echo $IMAGE_NAME > etc/ot/base-image
