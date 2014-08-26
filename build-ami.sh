@@ -177,7 +177,7 @@ umount -l ${ROOT_DIR}{/sys,/proc,/dev}
 
 [ -e /tmp/$IMAGE_NAME ] && rm -f /tmp/$IMAGE_NAME*
 
-tar -czv -C $ROOT_DIR -f /tmp/$IMAGE_NAME.tgz .
+tar -cz -C $ROOT_DIR -f /tmp/$IMAGE_NAME.tgz .
 aws s3 cp /tmp/$IMAGE_NAME.tgz s3://$S3_BUCKET/
 
 $EC2_AMITOOL_HOME/bin/ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 10240 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd --no-filter
