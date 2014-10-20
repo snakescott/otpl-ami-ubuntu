@@ -82,28 +82,6 @@ EOF
 
 chmod +x usr/sbin/policy-rc.d
 
-cat > tmp/ami-tools.patch <<PATCH
-*** ec2-ami-tools-1.4.0.1/lib/ec2/platform/linux/image.rb.org   2011-10-19 17:45:16.000000000 +0900
---- ec2-ami-tools-1.4.0.1/lib/ec2/platform/linux/image.rb       2011-10-19 17:45:55.000000000 +0900
-***************
-*** 276,282 ****
-              fstab_content = make_fstab
-              File.open( fstab, 'w' ) { |f| f.write( fstab_content ) }
-              puts "/etc/fstab:"
-!             fstab_content.each do |s|
-                puts "\t #{s}"
-              end
-            end
---- 276,282 ----
-              fstab_content = make_fstab
-              File.open( fstab, 'w' ) { |f| f.write( fstab_content ) }
-              puts "/etc/fstab:"
-!             fstab_content.each_line do |s|
-                puts "\t #{s}"
-              end
-            end
-PATCH
-
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
 
@@ -146,9 +124,6 @@ curl -sSfO http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
 unzip ec2-ami-tools.zip
 rm ec2-ami-tools.zip
 mv ec2-ami-tools-* ec2-ami-tools
-
-patch -p1 -d /opt/ec2-ami-tools -i /tmp/ami-tools.patch
-rm /tmp/ami-tools.patch
 
 echo 'export EC2_AMITOOL_HOME=/opt/ec2-ami-tools; export PATH=$PATH:$EC2_AMITOOL_HOME/bin' > /etc/profile.d/ami.sh
 chmod +x /etc/profile.d/ami.sh
