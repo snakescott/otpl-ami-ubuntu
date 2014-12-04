@@ -85,6 +85,8 @@ chmod +x usr/sbin/policy-rc.d
 cat > tmp/init-setup.sh <<SETUP
 set -o errexit -o nounset -o xtrace
 
+export DEBIAN_FRONTEND=noninteractive
+
 locale-gen en_US en_US.UTF-8
 dpkg-reconfigure locales
 
