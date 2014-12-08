@@ -42,7 +42,7 @@ echo "force-unsafe-io" > etc/dpkg/dpkg.cfg.d/02apt-speedup
 # we don't need an apt cache
 echo "Acquire::http {No-Cache=True;};" > etc/apt/apt.conf.d/no-cache
 
-debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,ca-certificates,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc,btrfs-tools,python-pip $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,ca-certificates,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc,btrfs-tools $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
 mount -o bind /proc proc
@@ -114,7 +114,7 @@ apt-get update
 apt-get dist-upgrade -y
 
 # install universe package which can't be debootstrapped
-apt-get install -y jq mosh
+apt-get install -y jq mosh python-pip
 
 # install apparmor too to work around https://github.com/dotcloud/docker/issues/4734, this should eventually go away
 apt-get install -y lxc lxc-docker apparmor apparmor-profiles
