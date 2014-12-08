@@ -1,2 +1,2 @@
-FROM registry.mesos-vpcqa.otenv.com/ot-ubuntu:latest
+FROM registry.mesos-vpcqa.otenv.com/ot-awsbuild:latest
 ADD . /otpl-ami-ubuntu
