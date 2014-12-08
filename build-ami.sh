@@ -42,7 +42,7 @@ echo "force-unsafe-io" > etc/dpkg/dpkg.cfg.d/02apt-speedup
 # we don't need an apt cache
 echo "Acquire::http {No-Cache=True;};" > etc/apt/apt.conf.d/no-cache
 
-debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,ca-certificates,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc,btrfs-tools $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
+debootstrap --include=cloud-init,man-db,manpages-dev,wget,git,git-man,curl,ca-certificates,zsh,rsync,screen,lsof,mlocate,nano,ssh,pax,strace,linux-image-virtual,grub,postfix,bsd-mailx,apt-transport-https,ntp,unzip,ruby,kpartx,gdisk,patch,psmisc,btrfs-tools,python-pip $RELEASE . http://us-west-2.ec2.archive.ubuntu.com/ubuntu/
 
 mount -o bind /sys sys
 mount -o bind /proc proc
@@ -130,7 +130,7 @@ mv ec2-ami-tools-* ec2-ami-tools
 echo 'export EC2_AMITOOL_HOME=/opt/ec2-ami-tools; export PATH=$PATH:$EC2_AMITOOL_HOME/bin' > /etc/profile.d/ami.sh
 chmod +x /etc/profile.d/ami.sh
 
-easy_install awscli
+pip install awscli
 
 apt-get purge -y linux-image-3.13.0-24-generic
 apt-get autoremove
