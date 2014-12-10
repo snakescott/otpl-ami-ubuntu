@@ -14,7 +14,7 @@ fi
 
 set -o xtrace
 
-SCRIPT_DIR=`pwd`/`dirname $0`
+SCRIPT_DIR=$PWD
 ROOT_DIR=$(mktemp -d)
 S3_BUCKET=$1
 IMAGE_NAME=$2
