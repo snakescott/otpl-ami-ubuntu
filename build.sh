@@ -153,10 +153,10 @@ cd
 
 umount -l ${ROOT_DIR}{/sys,/proc,/dev}
 
-[ -e /tmp/$IMAGE_NAME ] && rm -f /tmp/$IMAGE_NAME*
+[ -e $IMAGE_NAME ] && rm -f $IMAGE_NAME
 
-tar -cz -C $ROOT_DIR -f /tmp/$IMAGE_NAME.tgz .
-aws s3 cp /tmp/$IMAGE_NAME.tgz s3://$S3_BUCKET/
+tar -cz -C $ROOT_DIR -f $IMAGE_NAME.tgz .
+aws s3 cp $IMAGE_NAME.tgz s3://$S3_BUCKET/
 
 ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $AWS_ACCOUNT_ID -r x86_64 -p $IMAGE_NAME -s 10240 -v $ROOT_DIR --fstab $SCRIPT_DIR/config/fstab --no-inherit -B ami=sda,root=/dev/sda1,swap=/dev/sdb,ephemeral0=/dev/sdc,ephemeral1=/dev/sdd --no-filter
 ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY --region $EC2_REGION -m /tmp/$IMAGE_NAME.manifest.xml --retry
