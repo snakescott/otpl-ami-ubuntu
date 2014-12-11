@@ -163,6 +163,6 @@ ec2-upload-bundle -b $S3_BUCKET -a $AWS_ACCESS_KEY -s $AWS_SECRET_KEY -m /tmp/$I
 AMI=$(aws ec2 register-image --image-location $S3_BUCKET/$IMAGE_NAME.manifest.xml --name $IMAGE_NAME --architecture x86_64 --kernel-id $AKI | jq -r .ImageId)
 aws ec2 create-tags --resources $AMI --tags "Key=Name,Value=$IMAGE_NAME" "Key=ot-base-image,Value=ubuntu"
 
-rm -rf $ROOT_DIR /tmp/$IMAGE_NAME*
+rm -rf $ROOT_DIR /tmp/$IMAGE_NAME* || true
 
 echo "Completed: $AMI"
