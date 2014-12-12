@@ -145,7 +145,7 @@ rm tmp/init-setup.sh usr/sbin/policy-rc.d
 # Configure Docker daemon
 cat > etc/default/docker <<DOCKERCONF
 mkdir -p /mnt/docker /mnt/docker-tmp
-DOCKER_OPTS="-g /mnt/docker"
+DOCKER_OPTS="-g /mnt/docker --insecure-registry registry.mesos-vpcqa.otenv.com --insecure-registry registry.mesos-vpc0.otenv.com --insecure-registry registry.mesos-vpceu.otenv.com"
 export TMPDIR="/mnt/docker-tmp"
 DOCKERCONF
 
