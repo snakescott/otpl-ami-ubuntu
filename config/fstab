@@ -1,1 +1,1 @@
-LABEL=ec2root /         ext4    defaults        1 1
+/dev/xvda1 /         ext4    defaults        1 1
