@@ -134,7 +134,7 @@ pip install awscli
 
 cd /tmp
 apt-get purge -y linux-image-\*
-wget https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-headers-3.18.3_3.18.3-10.00.Custom_amd64.deb https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-image-3.18.3_3.18.3-10.00.Custom_amd64.deb
+wget https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-headers-custom_amd64.deb https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-image-custom_amd64.deb
 dpkg -i linux-*.deb
 rm linux-*.deb
 apt-get autoremove
