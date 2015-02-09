@@ -134,9 +134,9 @@ pip install awscli
 
 cd /tmp
 apt-get purge -y linux-image-\*
-wget https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-headers-custom_amd64.deb https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-image-custom_amd64.deb
-dpkg -i linux-*.deb
-rm linux-*.deb
+wget https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-headers-custom_amd64.deb https://s3-us-west-2.amazonaws.com/otmesos-misc/linux-image-custom_amd64.deb https://s3-us-west-2.amazonaws.com/otmesos-misc/btrfs-tools_3.18.2-0~14.10~ppa0_amd64.deb
+dpkg -i linux-*.deb btrfs-*.deb
+rm linux-*.deb btrfs-*.deb
 apt-get autoremove
 apt-get clean
 
